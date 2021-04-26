@@ -44,10 +44,23 @@ def generate_launch_description():
                               'params_file': params_cfg}.items()),
     ])
     
+    # use robot_state_publisher to publish the robot_description topic for viewing in RViz
+    xacro_path = os.path.join(rosbot_description, 'urdf', 'rosbot.xacro')
+    add_robot_st_pub = Node(
+            name='robot_state_publisher',
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            parameters=[{'use_sim_time': True,
+                         'robot_description': Command(['xacro', ' ', xacro_path]),
+                         'publish_frequency': 1.0
+                         }]
+            )
+
     ld = LaunchDescription()
     ld.add_action(declare_world_arg)
     ld.add_action(declare_map_arg)
     ld.add_action(declare_params_arg)
     ld.add_action(include_files)
+    ld.add_action(add_robot_st_pub)
     
     return ld
